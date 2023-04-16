@@ -1,10 +1,17 @@
 import os
+import argparse
 import pandas as pd
-from alpha_vantage.timeseries import TimeSeries
+from alpha_vantage.cryptocurrencies import CryptoCurrencies
 
-def get_intraday_data(symbol, interval, api_key):
-    ts = TimeSeries(key=api_key, output_format='pandas')
-    data, _ = ts.get_intraday(symbol=symbol, interval=interval)
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Obtener datos de criptomonedas')
+    parser.add_argument('symbol', type=str, help='Símbolo de la criptomoneda')
+    parser.add_argument('market', type=str, help='Moneda en la que se cotiza la criptomoneda')
+    return parser.parse_args()
+
+def get_crypto_data(symbol, market, api_key):
+    cc = CryptoCurrencies(key=api_key, output_format='pandas')
+    data, _ = cc.get_digital_currency_daily(symbol=symbol, market=market)
     return data
 
 def main():
@@ -13,12 +20,14 @@ def main():
         print("No se encontró la clave de API de Alpha Vantage. Asegúrate de configurar la variable de entorno ALPHA_VANTAGE_API_KEY.")
         return
 
-    symbol = 'MSFT'
-    interval = '5min'
+    args = parse_arguments()
+    symbol = args.symbol
+    market = args.market
 
-    intraday_data = get_intraday_data(symbol, interval, api_key)
-    print(f"Datos intradía para {symbol} con intervalo de {interval}:")
-    print(intraday_data)
+    crypto_data = get_crypto_data(symbol, market, api_key)
+
+    print(f"Datos diarios de la criptomoneda {symbol} en el mercado {market}:")
+    print(crypto_data)
 
 if __name__ == '__main__':
     main()
